@@ -1,0 +1,180 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="my-icons.html">
+
+<dom-module id="my-app">
+  <template>
+    <style>
+      :host {
+        --app-primary-color: #4285f4;
+        --app-secondary-color: black;
+
+        display: block;
+      }
+
+      app-header {
+        color: #fff;
+        background-color: var(--app-primary-color);
+      }
+      app-header paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+
+      .drawer-list {
+        margin: 0 20px;
+      }
+
+      .drawer-list a {
+        display: block;
+        padding: 0 16px;
+        text-decoration: none;
+        color: var(--app-secondary-color);
+        line-height: 40px;
+      }
+
+      .drawer-list a.iron-selected {
+        color: black;
+        font-weight: bold;
+      }
+    </style>
+
+    <app-location route="{{route}}"></app-location>
+    <app-route
+        route="{{route}}"
+        pattern="/:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+
+    <app-drawer-layout fullbleed>
+      <!-- Drawer content -->
+      <app-drawer id="drawer">
+        <app-toolbar>Menu</app-toolbar>
+        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+          <a name="view1" href="/view1">Foods</a>
+          <a name="view2" href="/view2">History</a>
+        </iron-selector>
+      </app-drawer>
+
+      <!-- Main content -->
+      <app-header-layout has-scrolling-region>
+
+        <app-header condenses reveals effects="waterfall">
+          <app-toolbar>
+            <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
+            <div main-title>Food Tracker</div>
+            <span style="flex: 1;"></span>
+            <paper-icon-button icon="icons:save" on-tap="saveProgress">SAVE</paper-icon-button>
+          </app-toolbar>
+        </app-header>
+
+        <iron-pages
+            selected="[[page]]"
+            attr-for-selected="name"
+            fallback-selection="view404"
+            role="main">
+          <my-view1 foods='{{foods}}' name="view1"></my-view1>
+          <my-view2 name="view2"></my-view2>
+          <my-view404 name="view404"></my-view404>
+        </iron-pages>
+      </app-header-layout>
+    </app-drawer-layout>
+    <my-view3 name="meta" id="meta"></my-view3>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'my-app',
+
+      properties: {
+        page: {
+          type: String,
+          reflectToAttribute: true,
+          observer: '_pageChanged',
+        },
+        foods: {
+          type: Object
+        }
+      },
+
+      observers: [
+        '_routePageChanged(routeData.page)',
+        '_foodsChanged(foods.*)'
+      ],
+
+      ready: function() {
+        this.foods = [
+          {display: 'Proteins', id: 1, expected: 4, total: 0, options: [{text:'1 cup greek yogurt', count: 0, id: 1}, {text:'2 cups whole grain cereal', count: 0, id: 2},{text:'3 Tbsp peanut butter', count: 0, id: 3}]},
+          {display: 'Calcium', id: 2, expected: 3, total: 0, options: [{text:'1 cup greek yogurt', count: 0, id: 1}, {text:'2 cups whole grain cereal', count: 0, id: 2},{text:'3 Tbsp peanut butter', count: 0, id: 3}]},
+          {display: 'Vitamin C', id: 3, expected: 2, total: 0, options: [{text:'1 cup greek yogurt', count: 0, id: 1}, {text:'2 cups whole grain cereal', count: 0, id: 2},{text:'3 Tbsp peanut butter', count: 0, id: 3}]},
+          {display: 'Leafy Greens', id: 4, expected: 3, total: 0, options: [{text:'1 cup greek yogurt', count: 0, id: 1}, {text:'2 cups whole grain cereal', count: 0, id: 2},{text:'3 Tbsp peanut butter', count: 0, id: 3}]}  
+        ];
+      },
+
+      _foodsChanged: function(change) {
+        if (change.path.indexOf('total') != -1) { return; }
+        var page = this.$$('my-view1');
+        var optionsSubPath = change.path.indexOf('.count');
+        var categoriesSubPath = change.path.indexOf('.options');
+        var optionId;
+        if (categoriesSubPath && categoriesSubPath !== -1 && 
+            optionsSubPath && optionsSubPath !== -1) {
+          var categoriesPath = change.path.substring(0, categoriesSubPath);
+          var optionPath = change.path.substring(0, optionsSubPath);
+          var option = this.get(optionPath);
+          optionId = option.id;
+          for (var f = 0; f < this.foods.length; f++) {
+            var category = this.foods[f];
+            var optionToCheck = category.options;
+            for (var o = 0; o < optionToCheck.length; o++) {
+              if (optionToCheck[o].id === optionId) {
+                this.set('foods.#' + f + '.options.#' + o + '.count', change.value);
+              }
+            }
+          }
+        }
+      },
+
+      saveProgress: function(event) {
+        
+      },
+
+      _routePageChanged: function(page) {
+        this.page = page || 'view1';
+
+        if (!this.$.drawer.persistent) {
+          this.$.drawer.close();
+        }
+      },
+
+      _pageChanged: function(page) {
+        // Load page import on demand. Show 404 page if fails
+        var resolvedPageUrl = this.resolveUrl('my-' + page + '.html');
+        this.importHref(resolvedPageUrl, null, this._showPage404, true);
+      },
+
+      _showPage404: function() {
+        this.page = 'view404';
+      },
+    });
+  </script>
+</dom-module>

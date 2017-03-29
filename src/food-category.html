@@ -1,0 +1,134 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-item/paper-icon-item.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="food-category">
+  <template>
+    <style include="shared-styles" is="custom-style">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+
+      paper-card.incomplete {
+        --paper-card-header-color: salmon;
+      }
+
+      paper-card.complete {
+        --paper-card-header-color: mediumseagreen;
+      }
+
+      vaadin-context-menu {
+        --vaadin-context-menu: none;
+      }
+
+      .flex-wrap {
+        @apply(--layout-horizontal);
+        @apply(--layout-wrap);
+        width: 200px;
+      }
+
+      .flex {
+        @apply(--layout-horizontal);
+      }
+
+      #optionCount {
+        margin: 5px, 5px;
+      }
+
+      .optionText {
+        padding: 8px;
+      }
+
+      .optionControl {
+        float: right
+      }
+
+      .option {
+        padding-left: 8px;
+        padding-right: 16px;
+      }
+    </style>
+
+    <paper-card heading="{{display}}  {{total}}/{{expected}}" class="incomplete">
+      <template is="dom-repeat" items="{{options}}" class="card-content container flex-wrap">
+        <div class="container flex option">
+          <div class="optionText">{{item.text}}</div>
+          <div class="optionControl container flex">
+            <paper-icon-button icon="remove-circle" on-tap="handleOptionDecrease"></paper-icon-button>
+            <div class="optionText" id="optionCount">{{item.count}}</div>
+            <paper-icon-button icon="add-circle" on-tap="handleOptionIncrease"></paper-icon-button>
+          </div>
+        </div>
+      </template>
+    </paper-card>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'food-category',
+      properties: {
+        display: {
+          type: String
+        },
+        expected: {
+          type: Object
+        },
+        options: {
+          type: String,
+          notify: true
+        },
+        total: {
+          type: Number,
+          computed: 'computeTotal(options.*)',
+          observer: 'updateTitleStyle'
+        }
+      },
+
+      computeTotal: function(options) {
+        var totes = 0;
+        for(var o = 0; o < options.base.length; o++) {
+          totes = totes + options.base[o].count;
+        }
+        return totes;
+      },
+
+      handleOptionIncrease: function(event) {
+        event.model.set('item.count', event.model.item.count+1);
+      },
+
+      handleOptionDecrease: function(event) {
+        if (event.model.item.count <= 0) { return false; }
+        event.model.set('item.count', event.model.item.count-1);
+        return false;
+      },
+
+      updateTitleStyle: function() {
+        if(this.total === undefined) { return; }
+        if(this.total === this.expected) {
+          this.$$('paper-card').className = 'complete';
+        } else if (this.total < this.expected) {
+          this.$$('paper-card').className = 'incomplete';
+        }
+        Polymer.updateStyles();
+      }
+    });
+  </script>
+</dom-module>

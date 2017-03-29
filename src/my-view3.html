@@ -1,0 +1,50 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="shared-styles.html">
+<link rel="import" href="../bower_components/iron-meta/iron-meta.html">
+
+<dom-module id="my-view3">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+
+        padding: 10px;
+      }
+    </style>
+
+    <iron-meta key="foods" value="{[
+      'proteins': {
+        'display': 'Proteins',
+        'expected': 4,
+        'options': ['1 cup greek yogurt', '2 cups whole grain cereal', '3 Tbsp peanut butter'']},
+      'calcium': {
+        'display': 'Calcium',
+        'expected': 3,
+        'options': [3/4 cup grated cheese, 1oz hard cheese, 1/2cup ricotta]},
+      'vitaminC': {
+        'display': 'Vitamin C',
+        'expected': 2,
+        'options': [2 cups romaine lettuce, 3/4 cup shreeded raw red cabbage, 1 kiwi]},
+      'leafyGreens': {
+        'display': 'Leafy Greens',
+        'expected': 3,
+        'options': [1/2 cup cubed cantaloupe, 1 pink grapefruit, 2 lg. fresh apricots]}  
+    ]}"></iron-meta>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'my-view3',
+    });
+  </script>
+</dom-module>
