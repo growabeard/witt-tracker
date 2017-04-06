@@ -18,8 +18,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="my-icons.html">
 
 <dom-module id="my-app">
@@ -59,6 +61,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 
     <app-location route="{{route}}"></app-location>
+
+    <iron-ajax
+      auto
+      url="https://witt-meal-track.herokuapp.com/foodlist"
+      handle-as="json"
+      on-response="handleResponse"
+      debounce-duration="300"></iron-ajax>
+    <iron-ajax
+      id="saveProgressCall"
+      url="https://witt-meal-track.herokuapp.com/save"
+      handle-as="json"
+      on-response="saveFinished"
+      debounce-duration="300"></iron-ajax>
     <app-route
         route="{{route}}"
         pattern="/:page"
@@ -68,7 +83,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <app-drawer-layout fullbleed>
       <!-- Drawer content -->
       <app-drawer id="drawer">
-        <app-toolbar>Menu</app-toolbar>
+        <app-toolbar sticky>Menu</app-toolbar>
         <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
           <a name="view1" href="/view1">Foods</a>
           <a name="view2" href="/view2">History</a>
@@ -84,6 +99,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <div main-title>Food Tracker</div>
             <span style="flex: 1;"></span>
             <paper-icon-button icon="icons:save" on-tap="saveProgress">SAVE</paper-icon-button>
+            <paper-progress value="10" indeterminate bottom-item></paper-progress>
           </app-toolbar>
         </app-header>
 
@@ -123,10 +139,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       ready: function() {
         this.foods = [
-          {display: 'Proteins', id: 1, expected: 4, total: 0, options: [{text:'1 cup greek yogurt', count: 0, id: 1}, {text:'2 cups whole grain cereal', count: 0, id: 2},{text:'3 Tbsp peanut butter', count: 0, id: 3}]},
-          {display: 'Calcium', id: 2, expected: 3, total: 0, options: [{text:'1 cup greek yogurt', count: 0, id: 1}, {text:'2 cups whole grain cereal', count: 0, id: 2},{text:'3 Tbsp peanut butter', count: 0, id: 3}]},
-          {display: 'Vitamin C', id: 3, expected: 2, total: 0, options: [{text:'1 cup greek yogurt', count: 0, id: 1}, {text:'2 cups whole grain cereal', count: 0, id: 2},{text:'3 Tbsp peanut butter', count: 0, id: 3}]},
-          {display: 'Leafy Greens', id: 4, expected: 3, total: 0, options: [{text:'1 cup greek yogurt', count: 0, id: 1}, {text:'2 cups whole grain cereal', count: 0, id: 2},{text:'3 Tbsp peanut butter', count: 0, id: 3}]}  
+          {"display":"Protein","id":1,"expected":3,"total":0,"options":[{"text":"3 8oz glasses of milk","id":1,"count":0},{"text":"2c yogurt","id":2,"count":0},{"text":"3oz cheese (3/4c grated)","id":3,"count":0},{"text":"4 eggs","id":4,"count":0},{"text":"3½oz canned tuna","id":5,"count":0},{"text":"4oz (when raw) fish","id":6,"count":0},{"text":"¾c cooked beans","id":7,"count":0},{"text":"½ c edamame","id":8,"count":0},{"text":"¾c green peas","id":9,"count":0},{"text":"1½oz peanuts","id":10,"count":0},{"text":"3T peanut butter","id":11,"count":0},{"text":"¾c oat bran","id":12,"count":0},{"text":"½c quinoa","id":13,"count":0},{"text":"2c whole-grain cereal","id":14,"count":0},{"text":"1oz (uncooked) high-protein pasta","id":15,"count":0},{"text":"3oz (uncooked) whole-wheat pasta","id":16,"count":0},{"text":"1½c cooked couscous/bulgur/buckwheat","id":17,"count":0},{"text":"4 slices whole-grain bread","id":18,"count":0},{"text":"4oz (when raw) beef/pork/chicken/turkey","id":19,"count":0},{"text":"2 whole-wheat pitas/English muffins","id":20,"count":0}]},{"display":"Calcium","id":2,"expected":4,"total":0,"options":[{"text":"¼c grated cheese","id":21,"count":0},{"text":"1oz hard cheese","id":22,"count":0},{"text":"½c ricotta","id":23,"count":0},{"text":"1c milk","id":24,"count":0},{"text":"1c yogurt","id":25,"count":0},{"text":"1½c frozen yogurt","id":26,"count":0},{"text":"1c calcium-fortified juice","id":27,"count":0},{"text":"3T grnd sesame seeds","id":28,"count":0},{"text":"1c cooked greens","id":29,"count":0},{"text":"1½c cooked bok choy","id":30,"count":0},{"text":"1½c cooked edamame","id":31,"count":0}]},{"display":"Vitamin C","id":3,"expected":3,"total":0,"options":[{"text":"2c romaine lettuce","id":32,"count":0},{"text":"¾c shredded raw red cabbage","id":33,"count":0},{"text":"1c edamame","id":34,"count":0},{"text":"¼c lemon juice","id":35,"count":0},{"text":"½c cubed cantaloupe/honeydew/pineapple","id":36,"count":0},{"text":"⅓ c strawberries","id":37,"count":0},{"text":"½ med. grapefruit/orange/mango/papaya","id":38,"count":0},{"text":"½c grapefruit/orange juice","id":39,"count":0},{"text":"⅔ c blackberries/raspberries","id":40,"count":0},{"text":"2c watermelon","id":41,"count":0},{"text":"1 med. tomato","id":42,"count":0},{"text":"½c cooked kale/spinach","id":43,"count":0},{"text":"1c packed raw spinach","id":44,"count":0},{"text":"¾c cooked greens","id":45,"count":0},{"text":"½c broccoli/cauliflower","id":46,"count":0},{"text":"¼ med. red/orange/yellow bell pepper","id":47,"count":0},{"text":"1 potato/sweet potato with skin","id":48,"count":0}]},{"display":"Other Fruits & Vegetables","id":5,"expected":2,"total":0,"options":[{"text":"1 med. apple/white peach/pear/banana","id":70,"count":0},{"text":"½c apple/pomegranate/pineapple juice","id":71,"count":0},{"text":"½c applesauce","id":72,"count":0},{"text":"½c fresh cherries","id":73,"count":0},{"text":"2 sm. plums","id":74,"count":0},{"text":"¼c cooked cranberries","id":75,"count":0},{"text":"½c blueberries","id":76,"count":0},{"text":"½ med. avocado","id":77,"count":0},{"text":"½c cooked green beans","id":78,"count":0},{"text":"½c sliced onion","id":79,"count":0},{"text":"1 sm. ear of corn","id":80,"count":0},{"text":"1c iceberg lettuce","id":81,"count":0},{"text":"½c green peas/snow peas","id":82,"count":0}]},{"display":"Whole Grains & Legumes","id":6,"expected":6,"total":0,"options":[{"text":"1 slice whole-wheat/whole-rye/whole-grain bread","id":83,"count":0},{"text":"1c oatmeal","id":84,"count":0},{"text":"1c whole-grain cereal","id":85,"count":0},{"text":"½ whole-wheat pita/roll/bagel/12in wrap/tortilla/english muffin","id":86,"count":0},{"text":"½c granola","id":87,"count":0},{"text":"½c cooked brown/wild rice/bulgur/couscous/barley/quinoa","id":88,"count":0},{"text":"2c popcorn","id":89,"count":0},{"text":"1oz (uncooked) whole-grain pasta","id":90,"count":0},{"text":"½c cooked beans/lentils/edamame","id":91,"count":0},{"text":"1oz whole-grain crackers","id":92,"count":0},{"text":"¼c whole-grain flour","id":93,"count":0}]},{"display":"Fats","id":7,"expected":4,"total":0,"options":[{"text":"1T oil/butter","id":94,"count":0},{"text":"1T mayonnaise","id":95,"count":0},{"text":"2T salad dressing","id":96,"count":0},{"text":"2T heavy cream","id":97,"count":0},{"text":"¼c half&half","id":98,"count":0},{"text":"¼c sour cream","id":99,"count":0},{"text":"2T cream cheese","id":100,"count":0},{"text":"2T peanut/almond butter","id":101,"count":0}]},{"display":"Vitamins","id":8,"expected":1,"total":0,"options":[{"text":"Prenatal Vitamin","id":103,"count":0}]},{"display":"Fluids","id":9,"expected":8,"total":0,"options":[{"text":"1 glass water","id":102,"count":0}]},{"display":"Green Leafy & Yellow Veggies & Fruits","id":4,"expected":4,"total":0,"options":[{"text":"½c cubed cantaloupe","id":49,"count":0},{"text":"2 lg. fresh apricots","id":50,"count":0},{"text":"6 dried apricot halves","id":51,"count":0},{"text":"½ med. mango/papaya","id":52,"count":0},{"text":"1 lg. nectarine / peach","id":53,"count":0},{"text":"1 sm. persimmon","id":54,"count":0},{"text":"¾c pink grapefruit juice","id":55,"count":0},{"text":"1 clementine","id":56,"count":0},{"text":"1 pink/ruby red grapefruit","id":57,"count":0},{"text":"½ carrot","id":58,"count":0},{"text":"¼c grated carrot","id":59,"count":0},{"text":"½ sm. sweet potato","id":60,"count":0},{"text":"2 med. tomatoes","id":61,"count":0},{"text":"½ med. red bell pepper","id":62,"count":0},{"text":"¼c chopped parsley","id":63,"count":0},{"text":"½c broccoli","id":64,"count":0},{"text":"1c coleslaw mix","id":65,"count":0},{"text":"¼c cooked greens","id":66,"count":0},{"text":"½c cooked spinach","id":67,"count":0},{"text":"1c packed lettuce / spinach","id":68,"count":0},{"text":"¼c cooked winter squash","id":69,"count":0}]}
         ];
       },
 
@@ -154,8 +167,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       },
 
+      handleResponse: function(event) {
+        this.foods = event.detail.response;
+      },
+
       saveProgress: function(event) {
-        
+        this.$.saveProgressCall.send({body: {updated: Date.now(), userId: 1, foods: this.foods}});
       },
 
       _routePageChanged: function(page) {

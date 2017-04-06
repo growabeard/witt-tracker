@@ -15,6 +15,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-item/paper-icon-item.html">
 <link rel="import" href="../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="shared-styles.html">
 
@@ -25,6 +26,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: block;
 
         padding: 10px;
+      }
+
+      paper-card {
+        width: 97%;
       }
 
       paper-card.incomplete {
@@ -68,6 +73,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 
     <paper-card heading="{{display}}  {{total}}/{{expected}}" class="incomplete">
+      <iron-collapse id="collapse">
       <template is="dom-repeat" items="{{options}}" class="card-content container flex-wrap">
         <div class="container flex option">
           <div class="optionText">{{item.text}}</div>
@@ -78,6 +84,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </div>
         </div>
       </template>
+      </iron-collapse>
+      <paper-icon-button id="collapseToggle" icon="arrow-drop-down" on-tap="_toggleCollapse"></paper-icon-button>
     </paper-card>
   </template>
 
@@ -102,6 +110,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       },
 
+      ready: function() {
+        //this.$$('div.header').onClick = this._toggleCollapse();
+      },
+
       computeTotal: function(options) {
         var totes = 0;
         for(var o = 0; o < options.base.length; o++) {
@@ -118,6 +130,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (event.model.item.count <= 0) { return false; }
         event.model.set('item.count', event.model.item.count-1);
         return false;
+      },
+
+      _toggleCollapse: function(e) {
+        this.$.collapse.toggle();
+        this.$.collapseToggle.icon = "arrow-drop-up";
       },
 
       updateTitleStyle: function() {

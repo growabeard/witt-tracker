@@ -11,7 +11,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="shared-styles.html">
 <link rel="import" href="food-category.html">
-<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 
 <dom-module id="my-view1">
@@ -22,9 +21,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         padding: 10px;
       }
+
+      food-category {
+        width: 100%;
+      }
     </style>
 
-    <template is="dom-repeat" items="{{foods}}" observe="options" class="container flex wrap">
+    <template is="dom-repeat" items="{{foods}}" observe="options" class="">
       <food-category display="{{item.display}}", total="{{item.total}}" expected="{{item.expected}}" options="{{item.options}}"></food-category>
     </template>
   </template>
