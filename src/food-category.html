@@ -123,26 +123,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
 
       handleOptionIncrease: function(event) {
-        event.model.set('item.count', event.model.item.count+1);
+        event.model.set('item.count', event.model.item.count+0.5);
       },
 
       handleOptionDecrease: function(event) {
         if (event.model.item.count <= 0) { return false; }
-        event.model.set('item.count', event.model.item.count-1);
+        event.model.set('item.count', event.model.item.count-0.5);
         return false;
       },
 
       _toggleCollapse: function(e) {
-        this.$.collapse.toggle();
-        this.$.collapseToggle.icon = "arrow-drop-up";
+        if(e.target.id === "collapseToggle"){
+          this.$.collapse.toggle();
+          if(this.$.collapse.opened) {
+            this.$.collapseToggle.icon = "arrow-drop-up";
+          } else {
+            this.$.collapseToggle.icon = "arrow-drop-down";
+          }
+        }
       },
 
       updateTitleStyle: function() {
-        if(this.total === undefined) { return; }
-        if(this.total === this.expected) {
-          this.$$('paper-card').className = 'complete';
-        } else if (this.total < this.expected) {
+        if(this.total === undefined || this.expected === undefined) { return; }
+        if (this.total < this.expected) {
           this.$$('paper-card').className = 'incomplete';
+        } else {
+          this.$$('paper-card').className = 'complete';
         }
         Polymer.updateStyles();
       }

@@ -6,7 +6,17 @@
     "eslint-config-google": "^0.7.1",
     "eslint-plugin-html": "^1.7.0",
     "gulp": "^3.9.1",
-    "gulp-vulcanize": "^6.1.0"
+    "gulp-vulcanize": "^6.1.0",
+    "gulp-load-plugins": "^1.5.0",
+    "del": "^2.2.2",
+    "run-sequence": "^1.2.2",
+    "browser-sync": "^2.18.8",
+    "fs": "^5.0.0",
+    "connect-history-api-fallback": "^1.3.0",
+    "merge-stream": "^1.0.1",
+    "proxy-middleware": "^0.15.0",
+    "url": "^0.11.0"
+
   },
   "scripts": {
     "lint": "eslint . --ext js,html --ignore-path .gitignore",

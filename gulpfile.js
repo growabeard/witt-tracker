@@ -8,29 +8,11 @@ var reload = browserSync.reload;
 var fs = require('fs');
 var historyApiFallback = require('connect-history-api-fallback');
 var merge = require('merge-stream');
-var componentName = 'lbs-navigation';
+var componentName = 'tracker';
 var proxy = require('proxy-middleware');
 var url = require('url');
 var vulcanize = require('gulp-vulcanize');
 
-var eslintTask = function(src) {
-  return gulp.src(src)
-    .pipe($.eslint())
-    .pipe($.eslint.format())
-    .pipe($.eslint.format('checkstyle', fs.createWriteStream('eslint_results.xml')))
-    .pipe($.eslint.failAfterError());
-};
-
-// Lint JavaScript
-gulp.task('eslint', function() {
-  return eslintTask([
-      'demo/**/*.{js,html}',
-      'test/**/*.{js,html}',
-      '*.html',
-      '!gulpfile.js',
-      '*.js'
-    ]);
-});
 
 // Clean Output Directory
 gulp.task('clean', function(cb) {
@@ -44,7 +26,7 @@ gulp.task('cleanAll', ['clean'], function(cb) {
 
 // Copy directory to format for polyserve
 gulp.task('copy', function() {
-  var tmp = gulp.src(['default/index.html']).pipe(gulp.dest('.tmp'));
+  var tmp = gulp.src(['index.html']).pipe(gulp.dest('.tmp'));
 
   var component = gulp.src([
     '*.html'
@@ -54,13 +36,17 @@ gulp.task('copy', function() {
     'demo/index.html'
   ]).pipe(gulp.dest('.tmp/components/' + componentName + '/demo'));
 
+  var src = gulp.src([
+    'src/*.html'
+  ]).pipe(gulp.dest('.tmp/components/' + componentName + '/src'));
+
   var test = gulp.src([
     'test/*.html'
   ]).pipe(gulp.dest('.tmp/components/' + componentName + '/test'));
 
   var bower = gulp.src(['bower_components/**/*.*']).pipe(gulp.dest('.tmp/components'));
 
-  return merge(tmp, component, demo, test, bower);
+  return merge(tmp, component, demo, test, src, bower);
 });
 
 // Watch Files For Changes & Reload
@@ -90,7 +76,7 @@ gulp.task('serve', ['default'], function() {
     }
   });
 
-  gulp.watch(['*.html', '*.js', '*.css', 'demo/*.html', 'test/*.html'], ['default:noclean'], reload);
+  gulp.watch(['*.html', '*.js', '*.css', 'demo/*.html', 'src/*.html', 'test/*.html'], ['default:noclean'], reload);
 });
 
 // Watch Files For Changes & Reload
@@ -127,7 +113,7 @@ gulp.task('mock', ['default'], function() {
     }
   });
 
-  gulp.watch(['*.html', '*.js', '*.css', 'demo/*.html', 'test/*.html'], ['default:noclean'], reload);
+  gulp.watch(['*.html', '*.js', '*.css', 'demo/*.html', 'src/*.html', 'test/*.html'], ['default:noclean'], reload);
 });
 
 // Build Production Files, the Default Task
@@ -141,14 +127,11 @@ gulp.task('default', ['clean'], function(cb) {
 // Build Production Files, the Default Task
 gulp.task('default:noclean', function(cb) {
   runSequence(
-    ['copy', 'eslint'],
+    ['copy'],// 'eslint'],
     cb
   );
 });
 
-// Load tasks for web-component-tester
-// Adds tasks for `gulp test:local` and `gulp test:remote`
-require('web-component-tester').gulp.init(gulp);
 
 // Load custom tasks from the `tasks` directory
 try { require('require-dir')('tasks'); } catch (err) {}
